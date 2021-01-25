@@ -1,19 +1,50 @@
 # First time hands-on with DPDK sample applications
 ## Introduction
-[To-Do]
+DPDK is already 10 years old, however it is now becoming more and more popular as many cloud-native solutions make use of it to improve their data-plane performance. For example, [Tungsten Vrouter](https://github.com/tungstenfabric/tf-vrouter), makes use of DPDK to complement it's rich feature set with an optimized data-plane performance.
+Although I have been hearing and reading about it already for some years, I never had hands-on experience with it. As understanding DPDK implementation is out my scope, I took a pragmatic approach with the single intention of being able to run the sample provided applications (helloworld and L2 forwarding application) to get a feeling of it.  Here you can find a guide to initiate yourself with the latest release of DPDK following the steps I did recently.
 ## Steps
 ### 1. Prepare the system
-[To-Do]
-#### 1.1 Set hugepages
-[To-Do]
-#### 1.2 Load PMD driver
-[To-Do]
-#### 1.3 Install dependencies
-[To-Do]
+#### 1.1 Install dependencies
+In order to build the source code as well as to execute the helper programs we need to install some dependencies. I will provide here the commands for Ubuntu, but please find the equivalent to match your linux distribution.
+General development tools including a supported C compiler
 ```bash
-#in a fedora/ubuntu system
+apt install build-essential
+```
+Python 3.5 or later
+```bash
+apt install python3
+```
+Meson (version 0.47.1+) and ninja
+```bash
 apt install meson ninja
 ```
+#### 1.2 Configure hugepages
+As the [DPDK Guide mentions](https://doc.dpdk.org/guides/linux_gsg/sys_reqs.html#use-of-hugepages-in-the-linux-environment):
+*By using hugepage allocations, performance is increased since fewer pages are needed, and therefore less Translation Lookaside Buffers (TLBs, high speed translation caches), which reduce the time it takes to translate a virtual page address to a physical page address. Without hugepages, high TLB miss rates would occur with the standard 4k page size, slowing performance*
+
+Therefore, we must configure them. In the `dpdk/usertools/` folder we can find several useful scripts. `./dpdk-hugepages.py` will help us with this first task.
+
+To display current huge page settings:
+```bash
+sudo python3 dpdk-hugepages.py -s
+```
+We will do a complete setup of with 2 Gigabyte of 1G huge pages:
+```bash
+sudo python3 dpdk-hugepages.py -p 1G --setup 2G
+```
+Please adjust to the resources that you might have available.
+
+#### 1.3 Load PMD driver
+We will be using `vfio`, which is a robust and secure driver. To load it:
+```bash
+sudo modprobe vfio-pci
+```
+In case you cannot use VFIO, `igb_uio` can be used. [Here](http://git.dpdk.org/dpdk-kmods) you can find it's source code and after compiling it, can be loaded with:
+```bash
+sudo modprobe uio
+sudo insmod igb_uio.ko
+```
+
 ### 2. Download the dpdk source code
 ```bash
 git clone https://github.com/DPDK/dpdk.git
@@ -203,13 +234,20 @@ Total packets dropped:               0
 ====================================================
 ```
 
-### 7. Clean up the dpdk setup
+If you do not have a hardware packet generator you can still use software like [scapy](https://github.com/secdev/scapy) to generate some.
+
+This is the end of this tutorial. Congratulations on executing dpdk application for the first time. Cleanup instructions can be found at the end of this file.
+## Conclusions
+We have seen how to download, install and compile the DPDK library as well as 2 sample applications. The l2fwd application has shown us how to bind physical devices to the application as well as a working example with real packet processing. Finally, we have seen how to clean up the setup and return the devices to their original steps.
+In the recent versions, tools like meson and ninja have been introduced, which have outdated a lot of explanatory videos on how to build and install DPDK. I hope this guide has helped you to overcome the issues I had because of the outdated material.
+
+## Clean up the dpdk setup
 As the interfaces are now binded to the user-space, they are not visible to the kernel and commands like
 ```bash
 ip -br link
 ```
 will not list them.
-To bind them again to the kernel driver we will use the same script `dpdk-devbind.py` to bind them again to their original driver `ixgbe`:
+We will use the same script `dpdk-devbind.py` to bind them again to their original driver `ixgbe`:
 ```bash
 sudo python3 ../../usertools/dpdk-devbind.py -b ixgbe 85:00.0 85:00.1
 ```
@@ -222,3 +260,6 @@ Which shows:
 ens8f0           UP             90:e2:ba:86:61:94 <BROADCAST,MULTICAST,UP,LOWER_UP>
 ens8f1           UP             90:e2:ba:86:61:95 <BROADCAST,MULTICAST,UP,LOWER_UP>
 ```
+
+## Bibliography
+[DPDK-Getting Started Guide for Linux](https://doc.dpdk.org/guides/linux_gsg/index.html#)
