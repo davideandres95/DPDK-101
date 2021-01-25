@@ -1,6 +1,6 @@
 # First time hands-on with DPDK sample applications
 ## Introduction
-DPDK [Data-Plane Development kit](https://www.dpdk.org/) is already 10 years old, however it is now becoming more and more popular as many cloud-native solutions make use of it to improve their data-plane performance. For example, [Tungsten Vrouter](https://github.com/tungstenfabric/tf-vrouter), makes use of DPDK to complement it's rich feature set with an optimized data-plane performance.
+The Data-Plane Development kit library[(DPDK)](https://www.dpdk.org/) is already 10 years old, however it is now becoming more and more popular as many cloud-native solutions make use of it to improve their data-plane performance. For example, [Tungsten Vrouter](https://github.com/tungstenfabric/tf-vrouter), makes use of DPDK to complement it's rich feature set with an optimized data-plane performance.
 Although I have been hearing and reading about it already for some years, I never had hands-on experience with it. As understanding DPDK implementation is out my scope, I took a pragmatic approach with the single intention of being able to run the sample provided applications (helloworld and L2 forwarding application) to get a feeling of it.  Here you can find a guide to initiate yourself with the latest release of DPDK following the steps I did recently.
 ## Steps
 ### 1. Prepare the system
