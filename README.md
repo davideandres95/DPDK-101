@@ -6,6 +6,7 @@ Although I have been hearing and reading about it already for some years, I neve
 ### 1. Prepare the system
 #### 1.1 Install dependencies
 In order to build the source code as well as to execute the helper programs we need to install some dependencies. I will provide here the commands for Ubuntu, but please find the equivalent to match your linux distribution.
+
 General development tools including a supported C compiler
 ```bash
 apt install build-essential
